@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head th:fragment="head">
+    <meta charset="UTF-8"/>
+    <title th:text="${title}"></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script type="text/javascript" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>
+</head>
+<body>
+<nav th:fragment="nav">
+    <a href="/cheese">List</a> |
+    <a href="/cheese/add">Add Cheese</a> |
+    <a href="/cheese/remove">Remove Cheese</a>
+</nav>
+</body>
+</html>

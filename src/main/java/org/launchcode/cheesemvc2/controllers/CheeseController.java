@@ -1,12 +1,16 @@
 package org.launchcode.cheesemvc2.controllers;
 
+import org.launchcode.cheesemvc2.models.Category;
 import org.launchcode.cheesemvc2.models.Cheese;
 import org.launchcode.cheesemvc2.models.CheeseType;
+import org.launchcode.cheesemvc2.models.data.CategoryDao;
 import org.launchcode.cheesemvc2.models.data.CheeseDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by schwifty on 10/27/17.
@@ -19,6 +23,9 @@ public class CheeseController {
 
     @Autowired
     private CheeseDao cheeseDao;
+
+    @Autowired
+    private CategoryDao categoryDao;
 
     @RequestMapping(value = "")
     public String index(Model model) {
@@ -33,12 +40,13 @@ public class CheeseController {
 
         model.addAttribute("cheese", new Cheese());
         model.addAttribute("title", "Add Cheese");
-        model.addAttribute("cheeseTypes", CheeseType.values());
+        model.addAttribute("categories", categoryDao.findAll());
+
         return "cheese/add";
     }
 
     @RequestMapping(value="add", method = RequestMethod.POST)
-    public String processAddCheeseForm(@ModelAttribute Cheese newCheese, Model model) {
+    public String processAddCheeseForm(@ModelAttribute Cheese newCheese, @RequestParam int categoryId, Model model) {
 
         if (newCheese.getName().length() < 3 || newCheese.getName().length() > 15) {
             model.addAttribute("nameError", "Name must be between 3-15 characters");
@@ -49,6 +57,7 @@ public class CheeseController {
             }
             model.addAttribute("cheese", new Cheese());
             model.addAttribute("title", "Add Cheese");
+            model.addAttribute("categories", categoryDao.findAll());
             return "cheese/add";
         }
 
@@ -61,9 +70,12 @@ public class CheeseController {
             }
             model.addAttribute("cheese", new Cheese());
             model.addAttribute("title", "Add Cheese");
+            model.addAttribute("categories", categoryDao.findAll());
             return "cheese/add";
         }
 
+        Category cat = categoryDao.findOne(categoryId);
+        newCheese.setCategory(cat);
         cheeseDao.save(newCheese);
 
 
@@ -84,6 +96,18 @@ public class CheeseController {
             cheeseDao.delete(cheeseId);
         }
         return "redirect:";
+    }
+
+    @RequestMapping(value = "category", method = RequestMethod.GET)
+    public String category(Model model, @RequestParam int id) {
+
+        Category cat = categoryDao.findOne(id);
+        List<Cheese> cheeses = cat.getCheeses();
+        model.addAttribute("cheeses", cheeses);
+        model.addAttribute("title", "Cheeses in category " + cat.getName());
+
+        return "cheese/index";
+
     }
 
 //    @RequestMapping(value="edit/{id}", method = RequestMethod.GET)
